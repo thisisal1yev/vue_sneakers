@@ -25,4 +25,4 @@ Please report bugs in the [Issues](https://github.com/thisisal1ev/vue_sneakers/i
 ## Connection
 
 <a href='mailto:aaalievvv1@gmail.com'>Email</a>
-<a href='https://t.me/thisisal1ev'>Telegram</a>
+<a href='https://t.me/thisisaliyev'>Telegram</a>
