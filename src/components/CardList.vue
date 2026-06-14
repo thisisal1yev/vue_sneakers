@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { ItemsProps } from '../@types'
+import { useCartStore } from '../stores'
 import { Card } from './'
 
 interface Props {
@@ -9,6 +10,8 @@ interface Props {
 
 defineProps<Props>()
 defineEmits(['addToFavorites', 'addToCart', 'cardClick'])
+
+const cartStore = useCartStore()
 </script>
 
 <template>
@@ -23,7 +26,7 @@ defineEmits(['addToFavorites', 'addToCart', 'cardClick'])
 			:img="item.imageUrl"
 			:price="item.price"
 			:isFavorite="item.isFavorite"
-			:isAdded="item.isAdded"
+			:isAdded="cartStore.isInCart(item.id)"
 			:isFavoritePage="isFavoritePage || false"
 			@onClickAddToFavorites="$emit('addToFavorites', item)"
 			@onClickAddToCart="$emit('addToCart', item)"

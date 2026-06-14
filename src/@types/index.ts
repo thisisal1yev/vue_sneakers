@@ -16,6 +16,7 @@ export interface OrderProps {
 	id: number
 	items: ItemsProps[]
 	totalPrice: number
+	createdAt?: string
 }
 
 export interface FavoriteProps extends TItems {

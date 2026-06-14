@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted } from 'vue'
 
+import { useScrollLock } from '../composables/useScrollLock'
 import { formatPrice } from '../utils/format'
 import { useCartStore, useItemsStore, useOrderStore } from '../stores'
 import { CartItem, InfoBlock } from './'
@@ -13,6 +14,8 @@ const orderStore = useOrderStore()
 const disabledButton = computed(
 	() => orderStore.isCreatingOrder || cartStore.cartIsEmpty
 )
+
+useScrollLock()
 
 function onKeydown(e: KeyboardEvent): void {
 	if (e.key === 'Escape') emit('close')
@@ -109,9 +112,31 @@ onUnmounted(() => {
 				:disabled="disabledButton"
 				class="flex justify-center items-center gap-3 w-full py-3 mt-10 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
 			>
-				Оформить заказ
+				<svg
+					v-if="orderStore.isCreatingOrder"
+					class="animate-spin w-5 h-5"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<circle
+						class="opacity-25"
+						cx="12"
+						cy="12"
+						r="10"
+						stroke="currentColor"
+						stroke-width="4"
+					/>
+					<path
+						class="opacity-75"
+						fill="currentColor"
+						d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+					/>
+				</svg>
 
-				<img src="/icons/arrow-next.svg" alt="" />
+				{{ orderStore.isCreatingOrder ? 'Оформление...' : 'Оформить заказ' }}
+
+				<img v-if="!orderStore.isCreatingOrder" src="/icons/arrow-next.svg" alt="" />
 			</button>
 		</div>
 	</div>

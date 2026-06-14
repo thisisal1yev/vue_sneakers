@@ -8,6 +8,7 @@ import { useNotificationStore } from './useNotificationStore'
 export const useOrderStore = defineStore('order', () => {
 	const orderId = ref<number | null>(null)
 	const isCreatingOrder = ref<boolean>(false)
+	const isLoadingOrders = ref<boolean>(false)
 	const orders = ref<OrderProps[]>([])
 
 	async function createOrder({ cartStore, itemsStore }: IOrderProps): Promise<void> {
@@ -32,10 +33,13 @@ export const useOrderStore = defineStore('order', () => {
 		const notificationStore = useNotificationStore()
 
 		try {
+			isLoadingOrders.value = true
 			orders.value = await getOrders()
 		} catch (e) {
 			console.error(e)
 			notificationStore.notify('Не удалось загрузить заказы')
+		} finally {
+			isLoadingOrders.value = false
 		}
 	}
 
@@ -43,5 +47,13 @@ export const useOrderStore = defineStore('order', () => {
 		orderId.value = null
 	}
 
-	return { orderId, isCreatingOrder, orders, createOrder, fetchOrders, resetOrder }
+	return {
+		orderId,
+		isCreatingOrder,
+		isLoadingOrders,
+		orders,
+		createOrder,
+		fetchOrders,
+		resetOrder,
+	}
 })

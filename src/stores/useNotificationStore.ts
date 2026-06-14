@@ -3,21 +3,26 @@ import { ref } from 'vue'
 
 export type NotificationType = 'error' | 'success'
 
+export interface Notification {
+	id: number
+	message: string
+	type: NotificationType
+}
+
 export const useNotificationStore = defineStore('notification', () => {
-	const message = ref<string | null>(null)
-	const type = ref<NotificationType>('error')
+	const notifications = ref<Notification[]>([])
 
-	let timer: ReturnType<typeof setTimeout>
+	let nextId = 0
 
-	function notify(msg: string, kind: NotificationType = 'error'): void {
-		message.value = msg
-		type.value = kind
-
-		clearTimeout(timer)
-		timer = setTimeout(() => {
-			message.value = null
-		}, 4000)
+	function dismiss(id: number): void {
+		notifications.value = notifications.value.filter(n => n.id !== id)
 	}
 
-	return { message, type, notify }
+	function notify(message: string, type: NotificationType = 'error'): void {
+		const id = ++nextId
+		notifications.value.push({ id, message, type })
+		setTimeout(() => dismiss(id), 4000)
+	}
+
+	return { notifications, notify, dismiss }
 })

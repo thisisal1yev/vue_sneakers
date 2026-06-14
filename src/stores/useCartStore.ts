@@ -18,6 +18,10 @@ export const useCartStore = defineStore('cart', () => {
 		return cart.value.find(cartItem => cartItem.id === item.id)
 	}
 
+	function isInCart(id: number): boolean {
+		return cart.value.some(cartItem => cartItem.id === id)
+	}
+
 	function addToCart(item: ItemsProps): void {
 		const line = findLine(item)
 
@@ -55,10 +59,10 @@ export const useCartStore = defineStore('cart', () => {
 	}
 
 	function addOrRemoveFromCart(item: ItemsProps): void {
-		if (!item.isAdded) {
-			addToCart(item)
-		} else {
+		if (isInCart(item.id)) {
 			removeFromCart(item)
+		} else {
+			addToCart(item)
 		}
 	}
 
@@ -68,6 +72,7 @@ export const useCartStore = defineStore('cart', () => {
 		totalPrice,
 		vatPrice,
 		cartIsEmpty,
+		isInCart,
 		addToCart,
 		increment,
 		decrement,

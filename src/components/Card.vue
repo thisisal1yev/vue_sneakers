@@ -34,6 +34,7 @@ defineEmits(['onClickAddToFavorites', 'onClickAddToCart', 'onClick'])
 		<img
 			width="220"
 			height="220"
+			loading="lazy"
 			:src="img"
 			class="w-full h-56"
 			:alt="title"

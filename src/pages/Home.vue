@@ -2,7 +2,7 @@
 import { inject, reactive, ref } from 'vue'
 
 import type { FiltersProps, ItemsProps } from '../@types'
-import { CardList, InfoBlock, ProductModal } from '../components'
+import { CardList, InfoBlock, ProductModal, SkeletonGrid } from '../components'
 import { addToFavorites } from '../services/favorites'
 import { useCartStore, useItemsStore } from '../stores'
 
@@ -60,16 +60,7 @@ const {
 	</div>
 
 	<div class="mt-10">
-		<div
-			v-if="itemsStore.isLoading"
-			class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
-		>
-			<div
-				v-for="n in 8"
-				:key="n"
-				class="h-80 rounded-xl bg-slate-100 animate-pulse"
-			/>
-		</div>
+		<SkeletonGrid v-if="itemsStore.isLoading" />
 
 		<CardList
 			v-else-if="itemsStore.items.length"

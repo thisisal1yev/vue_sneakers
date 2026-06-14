@@ -5,6 +5,7 @@ export async function makeOrder({ cartStore, itemsStore }: IOrderProps): Promise
 	const { data } = await axiosInstance.post('/orders', {
 		items: cartStore.cart,
 		totalPrice: cartStore.totalPrice,
+		createdAt: new Date().toISOString(),
 	})
 
 	cartStore.cart = []

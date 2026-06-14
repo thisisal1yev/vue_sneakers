@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { ItemsProps } from '../@types'
+import { useScrollLock } from '../composables/useScrollLock'
 import { formatPrice } from '../utils/format'
 
 interface Props {
@@ -8,6 +9,8 @@ interface Props {
 
 defineProps<Props>()
 defineEmits(['close'])
+
+useScrollLock()
 </script>
 
 <template>
@@ -30,7 +33,13 @@ defineEmits(['close'])
 				<img src="/icons/close.svg" alt="" />
 			</button>
 
-			<img :src="item.imageUrl" :alt="item.title" class="w-full h-72 object-contain" />
+			<img
+				:src="item.imageUrl"
+				:alt="item.title"
+				width="220"
+				height="220"
+				class="w-full h-72 object-contain"
+			/>
 
 			<h2 class="mt-4 text-2xl font-bold">{{ item.title }}</h2>
 

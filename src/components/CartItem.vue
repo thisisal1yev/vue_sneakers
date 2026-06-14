@@ -16,7 +16,14 @@ defineEmits(['onClickDelete', 'increment', 'decrement'])
 	<div
 		class="relative flex w-full border border-slate-100 rounded-xl p-4 gap-4"
 	>
-		<img :src="img" class="w-16 h-16" :alt="title" />
+		<img
+			:src="img"
+			width="64"
+			height="64"
+			loading="lazy"
+			class="w-16 h-16"
+			:alt="title"
+		/>
 
 		<div class="flex flex-col w-full">
 			<p>{{ title }}</p>
