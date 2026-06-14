@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { formatPrice } from '../utils/format'
+
 interface Props {
 	title: string
 	img: string
@@ -9,21 +11,23 @@ interface Props {
 }
 
 defineProps<Props>()
-defineEmits(['onClickAddToFavorites', 'onClickAddToCart'])
+defineEmits(['onClickAddToFavorites', 'onClickAddToCart', 'onClick'])
 </script>
 
 <template>
 	<div
+		@click="$emit('onClick')"
 		class="relative flex flex-col w-full border border-slate-100 rounded-xl p-8 cursor-pointer transition hover:shadow-xl hover:transform hover:-translate-y-2"
 	>
 		<button
 			v-if="!isFavoritePage"
-			@click="$emit('onClickAddToFavorites')"
+			@click.stop="$emit('onClickAddToFavorites')"
 			class="absolute top-8 left-8"
+			:aria-label="isFavorite ? 'Убрать из закладок' : 'В закладки'"
 		>
 			<img
 				:src="isFavorite ? '/icons/like-2.svg' : '/icons/like-1.svg'"
-				alt="Favorite"
+				alt=""
 			/>
 		</button>
 
@@ -32,7 +36,7 @@ defineEmits(['onClickAddToFavorites', 'onClickAddToCart'])
 			height="220"
 			:src="img"
 			class="w-full h-56"
-			alt="Sneaker"
+			:alt="title"
 		/>
 
 		<p>{{ title }}</p>
@@ -41,15 +45,19 @@ defineEmits(['onClickAddToFavorites', 'onClickAddToCart'])
 			<div class="flex flex-col gap-2">
 				<span class="text-slate-200">Цена:</span>
 
-				<span class="font-bold">{{ price }} &#8381;</span>
+				<span class="font-bold">{{ formatPrice(price) }}</span>
 			</div>
 
-			<button v-if="!isFavoritePage" @click="$emit('onClickAddToCart')">
+			<button
+				v-if="!isFavoritePage"
+				@click.stop="$emit('onClickAddToCart')"
+				:aria-label="isAdded ? 'Убрать из корзины' : 'В корзину'"
+			>
 				<img
 					:src="isAdded ? '/icons/checked.svg' : '/icons/plus.svg'"
 					width="32"
 					height="32"
-					alt="Plus"
+					alt=""
 				/>
 			</button>
 		</div>

@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { inject, reactive } from 'vue'
+import { inject, reactive, ref } from 'vue'
 
 import type { FiltersProps, ItemsProps } from '../@types'
-import { CardList } from '../components'
+import { CardList, InfoBlock, ProductModal } from '../components'
 import { addToFavorites } from '../services/favorites'
 import { useCartStore, useItemsStore } from '../stores'
 
 const itemsStore = useItemsStore()
 const cartStore = useCartStore()
+const selectedItem = ref<ItemsProps | null>(null)
 const filters = reactive<FiltersProps>({
 	sortBy: 'title',
 	searchQuery: '',
@@ -26,7 +27,7 @@ const {
 </script>
 
 <template>
-	<div class="flex justify-between items-center mb-10">
+	<div class="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-10">
 		<h1 class="text-3xl font-bold">Все кроссовки</h1>
 
 		<div class="flex items-center gap-4">
@@ -52,17 +53,43 @@ const {
 				<div
 					class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
 				>
-					<img src="/icons/search.svg" />
+					<img src="/icons/search.svg" alt="" />
 				</div>
 			</div>
 		</div>
 	</div>
 
 	<div class="mt-10">
+		<div
+			v-if="itemsStore.isLoading"
+			class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+		>
+			<div
+				v-for="n in 8"
+				:key="n"
+				class="h-80 rounded-xl bg-slate-100 animate-pulse"
+			/>
+		</div>
+
 		<CardList
+			v-else-if="itemsStore.items.length"
 			:items="itemsStore.items"
-			@addToFavorites="(item: ItemsProps )=> addToFavorites(item)"
-			@addToCart="(item: ItemsProps )=> cartStore.addOrRemoveFromCart(item)"
+			@addToFavorites="(item: ItemsProps) => addToFavorites(item)"
+			@addToCart="(item: ItemsProps) => cartStore.addOrRemoveFromCart(item)"
+			@cardClick="(item: ItemsProps) => (selectedItem = item)"
+		/>
+
+		<InfoBlock
+			v-else
+			:imageUrl="'/empty-box.png'"
+			:title="'Ничего не найдено'"
+			:description="'Попробуйте изменить запрос.'"
 		/>
 	</div>
+
+	<ProductModal
+		v-if="selectedItem"
+		:item="selectedItem"
+		@close="selectedItem = null"
+	/>
 </template>

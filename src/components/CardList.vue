@@ -8,11 +8,14 @@ interface Props {
 }
 
 defineProps<Props>()
-defineEmits(['addToFavorites', 'addToCart'])
+defineEmits(['addToFavorites', 'addToCart', 'cardClick'])
 </script>
 
 <template>
-	<div class="grid grid-cols-4 gap-5" v-auto-animate>
+	<div
+		class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+		v-auto-animate
+	>
 		<Card
 			v-for="item in items"
 			:key="item.id"
@@ -24,6 +27,7 @@ defineEmits(['addToFavorites', 'addToCart'])
 			:isFavoritePage="isFavoritePage || false"
 			@onClickAddToFavorites="$emit('addToFavorites', item)"
 			@onClickAddToCart="$emit('addToCart', item)"
+			@onClick="$emit('cardClick', item)"
 		/>
 	</div>
 </template>

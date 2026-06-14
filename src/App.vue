@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { onMounted, provide, reactive, ref, watch } from 'vue'
+import { computed, onMounted, provide, reactive, ref, watch } from 'vue'
 import { RouterView } from 'vue-router'
 
-import type { FiltersProps, ItemsProps, SortBy } from './@types'
-import { Header } from './components'
+import type { FiltersProps, SortBy } from './@types'
+import { Header, Toast } from './components'
 import Drawer from './components/Drawer.vue'
 import { useCartStore, useItemsStore } from './stores'
+import { debounce } from './utils/debounce'
 
 const cartStore = useCartStore()
 const itemsStore = useItemsStore()
@@ -15,6 +16,10 @@ const filters = reactive<FiltersProps>({
 	searchQuery: '',
 })
 
+const favoritesCount = computed(
+	() => itemsStore.items.filter(item => item.isFavorite).length
+)
+
 const toggleDrawer = (): void => {
 	isDrawerOpen.value = !isDrawerOpen.value
 }
@@ -23,9 +28,9 @@ const sort = (value: SortBy): void => {
 	filters.sortBy = value
 }
 
-const search = (value: string): void => {
+const search = debounce((value: string): void => {
 	filters.searchQuery = value.trim()
-}
+}, 300)
 
 provide('items', { sort, search })
 
@@ -46,17 +51,20 @@ watch(
 </script>
 
 <template>
-	<Drawer
-		v-if="isDrawerOpen"
-		@close="toggleDrawer"
-		@deleteItem="(item:ItemsProps) => cartStore.removeFromCart(item)"
-	/>
+	<Drawer v-if="isDrawerOpen" @close="toggleDrawer" />
 
-	<div class="bg-white w-4/5 m-auto rounded-xl shadow-xl mt-14">
-		<Header :totalPrice="cartStore.totalPrice" @openDrawer="toggleDrawer" />
+	<div class="bg-white w-full sm:w-4/5 m-auto rounded-xl shadow-xl mt-14">
+		<Header
+			:totalPrice="cartStore.totalPrice"
+			:totalCount="cartStore.totalCount"
+			:favoritesCount="favoritesCount"
+			@openDrawer="toggleDrawer"
+		/>
 
-		<div class="p-10">
+		<div class="p-6 sm:p-10">
 			<RouterView />
 		</div>
 	</div>
+
+	<Toast />
 </template>

@@ -1,19 +1,28 @@
 <script lang="ts" setup>
-import { computed, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 
+import { formatPrice } from '../utils/format'
 import { useCartStore, useItemsStore, useOrderStore } from '../stores'
 import { CartItem, InfoBlock } from './'
 
-defineEmits(['close', 'deleteItem'])
+const emit = defineEmits(['close'])
 
 const cartStore = useCartStore()
 const itemsStore = useItemsStore()
 const orderStore = useOrderStore()
-
-onUnmounted(() => orderStore.resetOrder())
 const disabledButton = computed(
 	() => orderStore.isCreatingOrder || cartStore.cartIsEmpty
 )
+
+function onKeydown(e: KeyboardEvent): void {
+	if (e.key === 'Escape') emit('close')
+}
+
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onUnmounted(() => {
+	window.removeEventListener('keydown', onKeydown)
+	orderStore.resetOrder()
+})
 </script>
 
 <template>
@@ -24,10 +33,13 @@ const disabledButton = computed(
 
 	<div
 		v-if="!cartStore.cartIsEmpty"
-		class="flex flex-col justify-between fixed z-10 top-0 h-full right-0 w-1/4 bg-white px-8 py-5"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Корзина"
+		class="flex flex-col justify-between fixed z-10 top-0 h-full right-0 w-full sm:w-96 bg-white px-8 py-5"
 	>
 		<h2 class="text-2xl font-bold mb-10 flex items-center gap-5">
-			<button @click="$emit('close')" class="p-2 group">
+			<button @click="$emit('close')" class="p-2 group" aria-label="Закрыть корзину">
 				<svg
 					class="rotate-180 group-hover:-translate-x-1 opacity-30 group-hover:opacity-100 transition cursor-pointer"
 					width="16"
@@ -57,14 +69,17 @@ const disabledButton = computed(
 			Корзина
 		</h2>
 
-		<div class="overflow-auto flex-1 grow space-y-3 my-5">
+		<div class="overflow-auto flex-1 grow space-y-3 my-5" v-auto-animate>
 			<CartItem
-				v-if="!cartStore.cartIsEmpty"
 				v-for="item in cartStore.cart"
+				:key="item.id"
 				:title="item.title"
 				:price="item.price"
 				:img="item.imageUrl"
-				@onClickDelete="$emit('deleteItem', item)"
+				:quantity="item.quantity"
+				@increment="cartStore.increment(item)"
+				@decrement="cartStore.decrement(item)"
+				@onClickDelete="cartStore.removeFromCart(item)"
 			/>
 		</div>
 
@@ -75,8 +90,8 @@ const disabledButton = computed(
 
 					<div class="flex-1 border-b border-dashed" />
 
-					<span class="font-bold"
-						>{{ cartStore.totalPrice + cartStore.vatPrice }} &#8381;
+					<span class="font-bold">
+						{{ formatPrice(cartStore.totalPrice + cartStore.vatPrice) }}
 					</span>
 				</div>
 
@@ -85,31 +100,27 @@ const disabledButton = computed(
 
 					<div class="flex-1 border-b border-dashed" />
 
-					<span class="font-bold">{{ cartStore.vatPrice }} &#8381;</span>
+					<span class="font-bold">{{ formatPrice(cartStore.vatPrice) }}</span>
 				</div>
 			</div>
 
 			<button
-				@click="
-					() =>
-						orderStore.createOrder({
-							cartStore,
-							itemsStore,
-						})
-				"
+				@click="orderStore.createOrder({ cartStore, itemsStore })"
 				:disabled="disabledButton"
 				class="flex justify-center items-center gap-3 w-full py-3 mt-10 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
 			>
 				Оформить заказ
 
-				<img src="/icons/arrow-next.svg" alt="Arrow" />
+				<img src="/icons/arrow-next.svg" alt="" />
 			</button>
 		</div>
 	</div>
 
 	<div
 		v-else
-		class="flex flex-col justify-center fixed z-10 top-0 h-full right-0 w-1/4 bg-white px-8 py-5"
+		role="dialog"
+		aria-modal="true"
+		class="flex flex-col justify-center fixed z-10 top-0 h-full right-0 w-full sm:w-96 bg-white px-8 py-5"
 	>
 		<InfoBlock
 			v-if="!cartStore.totalPrice && orderStore.orderId"
@@ -129,7 +140,7 @@ const disabledButton = computed(
 			@click="$emit('close')"
 			class="flex justify-center items-center gap-3 w-full py-3 mt-10 bg-lime-500 text-white rounded-xl transition active:bg-lime-700 hover:bg-lime-600"
 		>
-			<img src="/icons/arrow-left.svg" alt="Arrow" />
+			<img src="/icons/arrow-left.svg" alt="" />
 
 			Вернуться назад
 		</button>

@@ -9,6 +9,13 @@ export interface ItemsProps extends TItems {
 	isAdded: boolean
 	isFavorite: boolean
 	favoriteId?: number | null
+	quantity?: number
+}
+
+export interface OrderProps {
+	id: number
+	items: ItemsProps[]
+	totalPrice: number
 }
 
 export interface FavoriteProps extends TItems {

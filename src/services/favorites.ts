@@ -1,27 +1,16 @@
-import { ref, type Ref } from 'vue'
-
 import type { FavoritesProps, ItemsProps } from '../@types'
+import { useNotificationStore } from '../stores/useNotificationStore'
 import { axiosInstance } from './instance'
 
-const favorites = ref<ItemsProps[]>([])
+export async function getFavorites(): Promise<ItemsProps[]> {
+	const { data } = await axiosInstance.get('/favorites?_relations=items')
 
-export async function getFavorites(): Promise<Ref<ItemsProps[]>> {
-	try {
-		const { data } = await axiosInstance.get(
-			'/favorites?_relations=items'
-		)
-
-		favorites.value = data.map((item: FavoritesProps) => item.item)
-
-		return favorites
-	} catch (e) {
-		console.error(e)
-		return favorites
-	}
+	return data.map((favorite: FavoritesProps) => favorite.item as ItemsProps)
 }
 
-
 export async function addToFavorites(item: ItemsProps): Promise<void> {
+	const notificationStore = useNotificationStore()
+
 	try {
 		if (!item.isFavorite) {
 			const obj = {
@@ -31,7 +20,7 @@ export async function addToFavorites(item: ItemsProps): Promise<void> {
 
 			item.isFavorite = true
 
-			const { data } = await axiosInstance.post(`/favorites`, obj)
+			const { data } = await axiosInstance.post('/favorites', obj)
 
 			item.favoriteId = data.id
 		} else {
@@ -41,6 +30,8 @@ export async function addToFavorites(item: ItemsProps): Promise<void> {
 			item.favoriteId = null
 		}
 	} catch (e) {
-		console.log(e)
+		console.error(e)
+		item.isFavorite = !item.isFavorite
+		notificationStore.notify('Не удалось обновить закладки')
 	}
 }
