@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, onUnmounted } from 'vue'
 
 import { useCartStore, useItemsStore, useOrderStore } from '../stores'
 import { CartItem, InfoBlock } from './'
@@ -9,6 +9,8 @@ defineEmits(['close', 'deleteItem'])
 const cartStore = useCartStore()
 const itemsStore = useItemsStore()
 const orderStore = useOrderStore()
+
+onUnmounted(() => orderStore.resetOrder())
 const disabledButton = computed(
 	() => orderStore.isCreatingOrder || cartStore.cartIsEmpty
 )

@@ -10,12 +10,13 @@ export const useCartStore = defineStore('cart', () => {
 	const vatPrice = computed(() => Math.round(totalPrice.value * 5) / 100)
 
 	function addToCart(item: ItemsProps): void {
+		if (cart.value.some(cartItem => cartItem.id === item.id)) return
 		cart.value.push(item)
 		item.isAdded = true
 	}
 
 	function removeFromCart(item: ItemsProps): void {
-		cart.value.splice(cart.value.indexOf(item), 1)
+		cart.value = cart.value.filter(cartItem => cartItem.id !== item.id)
 		item.isAdded = false
 	}
 

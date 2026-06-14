@@ -34,13 +34,6 @@ onMounted(async () => {
 	cartStore.cart = localCart ? JSON.parse(localCart) : []
 
 	await itemsStore.fetchItems(filters)
-	await itemsStore.fetchFavorites()
-
-	itemsStore.items = itemsStore.items.map((item: ItemsProps) => ({
-		...item,
-		isFavorite: item.isFavorite,
-		isAdded: cartStore.cart.some(cartItem => cartItem.id === item.id),
-	}))
 })
 watch(filters, itemsStore.fetchItems)
 watch(

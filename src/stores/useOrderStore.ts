@@ -21,5 +21,9 @@ export const useOrderStore = defineStore('order', () => {
 		}
 	}
 
-	return { orderId, isCreatingOrder, createOrder }
+	function resetOrder(): void {
+		orderId.value = null
+	}
+
+	return { orderId, isCreatingOrder, createOrder, resetOrder }
 })
